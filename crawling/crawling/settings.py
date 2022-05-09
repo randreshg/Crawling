@@ -11,7 +11,6 @@ BOT_NAME = 'crawling'
 
 SPIDER_MODULES = ['crawling.spiders']
 NEWSPIDER_MODULE = 'crawling.spiders'
-USER_AGENT = 'CederGroup@berkeley; TDM Account number: 1351332'
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
@@ -59,9 +58,19 @@ DOWNLOAD_DELAY = 1
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'crawling.pipelines.CrawlingPipeline': 300,
+   'crawling.pipelines.CrawlingPipeline': 300
 }
 
+# Elastic search
+ITEM_PIPELINES = {
+    'scrapyelasticsearch.scrapyelasticsearch.ElasticSearchPipeline': 500
+}
+
+ELASTICSEARCH_SERVERS = ['http://localhost:9200']
+ELASTICSEARCH_INDEX_DATE_FORMAT = '%Y-%m'
+ELASTICSEARCH_INDEX = 'scrapy'
+ELASTICSEARCH_TYPE = 'items'
+ELASTICSEARCH_UNIQ_KEY = 'DOI'
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html

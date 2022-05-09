@@ -16,6 +16,15 @@ function main(splash, args)
 end
 """
 
+def encodeString(string):
+    return string
+    #.encode("utf-8").decode('unicode_escape')
+
+def convertToString(string):
+        return (BeautifulSoup(encodeString(string.extract_first()), 
+                'html.parser').get_text().strip().replace("\n", ""))
+
+
 class RSCSpider(scrapy.Spider):
     name = "RSC"
 
@@ -44,8 +53,7 @@ class RSCSpider(scrapy.Spider):
                                                                   issue_year['Issue']))
             # Crawling
             for article_tab in response.css('div.capsule.capsule--article'):
-                article_type = BeautifulSoup(article_tab.css('span.capsule__context').extract_first(),
-                                             'html.parser').get_text().strip()
+                article_type = convertToString(article_tab.css('span.capsule__context'))
                 open_access = bool(article_tab.css("span.capsule__context > img").extract_first())
                 if article_type not in self.exclude_article_types:
                     article_page = article_tab.css('a.capsule__action::attr(href)').extract_first()
@@ -56,16 +64,10 @@ class RSCSpider(scrapy.Spider):
                     request.meta['meta_info'] = current_crawl_results
                     yield request
 
-            # Only crawl papers after 2000
-            # previous_issue = response.css('.article-nav__bar a:nth-child(1)::attr(href)').extract_first()
-            # if previous_issue:
-            #     previous_issue = response.urljoin(previous_issue)
-            #     yield SplashRequest(previous_issue, self.parse, args={'lua_source': SPLASH_SCRIPT.format(8)}, endpoint='execute')
 
     @staticmethod
     def _parse_issue_year(response):
-        journal = BeautifulSoup(response.css('.page-head__vcenter span:nth-child(1)').extract_first(),
-                                'html.parser').get_text().strip()
+        journal = convertToString(response.css('.page-head__vcenter span:nth-child(1)'))
         issue_year_info = response.css('#tabissues .h--heading4').extract_first()
         year = int(issue_year_info.split(",")[0][-4:])
         issue = int(issue_year_info.split(",")[1][-2:])
@@ -73,28 +75,29 @@ class RSCSpider(scrapy.Spider):
 
     @staticmethod
     def _parse_article(response):
+        title = convertToString(response.css("div.article__title > h2.capsule__title"))
+        abstract = convertToString(response.css("div.capsule__text"))
         try:
-            title = BeautifulSoup(response.css("div.article__title > h2.capsule__title").extract_first(),
-                                    'html.parser').get_text().strip()
-            abstract = BeautifulSoup(response.css("div.capsule__text").extract_first(), 'html.parser').get_text().strip()
-            doi = BeautifulSoup(response.css('.text--small').extract_first(), 'html.parser').get_text().strip()
-            article_html_link = response.css("a.btn-icon--download+.btn--stack::attr(href)").extract_first()
-            article_html_link = response.urljoin(article_html_link)
-            article_pdf_link = response.css("a.btn-icon--download::attr(href)").extract_first()
-            article_pdf_link = response.urljoin(article_pdf_link)
-            authors = []
-            for author in response.css('.input__label').extract():
-                authors.append(BeautifulSoup(author, 'html.parser').get_text().strip())
-            results = {"Title": title,
-                        "Abstract": abstract,
-                        "DOI": doi,
-                        "Article_HTML_Link": article_html_link,
-                        "Article_PDF_Link": article_pdf_link,
-                        "Authors": authors
-                        }
-            meta_data = response.meta['meta_info']
-            results.update(meta_data)
-            #print(results)
-            yield results
+            content = convertToString(response.css("#pnlArticleContent"))
         except:
-            pass
+            content = ""
+        doi = convertToString(response.css('.text--small'))
+        article_html_link = response.css("a.btn-icon--download+.btn--stack::attr(href)").extract_first()
+        article_html_link = response.urljoin(article_html_link)
+        article_pdf_link = response.css("a.btn-icon--download::attr(href)").extract_first()
+        article_pdf_link = response.urljoin(article_pdf_link)
+        authors = []
+        for author in response.css('.input__label').extract():
+            authors.append(encodeString(BeautifulSoup(author, 'html.parser').get_text().strip()))
+        results = {"Title": title,
+                    "Abstract": abstract,
+                    "Content": content,
+                    "DOI": doi,
+                    "Article_HTML_Link": article_html_link,
+                    "Article_PDF_Link": article_pdf_link,
+                    "Authors": authors
+                    }
+        meta_data = response.meta['meta_info']
+        results.update(meta_data)
+        #print(results)
+        yield results
