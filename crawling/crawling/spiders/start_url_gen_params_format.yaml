@@ -1,0 +1,41 @@
+RSC:
+  Chemical_Society_Reviews:
+    format: http://pubs.rsc.org/en/journals/journalissues/cs#!issueid=cs{}&type=current&issnprint=0306-0012
+    start_vol: 49
+    end_vol: 51
+    issue_per_year: 24
+  Chemical_Science:
+    format: http://pubs.rsc.org/en/journals/journalissues/sc#!issueid=sc{}&type=current&issnprint=2041-6520
+    start_vol: 11
+    end_vol: 13
+    issue_per_year: 50
+  Catalysis_Science_Technology:
+    format: http://pubs.rsc.org/en/journals/journalissues/cy#!issueid=cy{}&type=current&issnprint=2044-4753
+    start_vol: 10
+    end_vol: 12
+    issue_per_year: 25
+  Energy_Environmental_Science:
+    format: http://pubs.rsc.org/en/journals/journalissues/ee#!issueid=ee{}&type=current&issnprint=1754-5692
+    start_vol: 13
+    end_vol: 15
+    issue_per_year: 12
+  Green_Chemistry:
+    format: http://pubs.rsc.org/en/journals/journalissues/gc#!issueid=gc{}&type=current&issnprint=1463-9262
+    start_vol: 22
+    end_vol: 24
+    issue_per_year: 24
+  Reaction_Chemistry_Engineering:
+    format: http://pubs.rsc.org/en/journals/journalissues/re#!issueid=re{}&type=current&issnonline=2058-9883
+    start_vol: 5
+    end_vol: 7
+    issue_per_year: 12
+  Molecular_Systems_Design_Engineering:
+    format: http://pubs.rsc.org/en/journals/journalissues/me#!issueid=me{}&type=current&issnonline=2058-9689
+    start_vol: 5
+    end_vol: 7
+    issue_per_year: 12
+  Polymer_Chemistry:
+    format: http://pubs.rsc.org/en/journals/journalissues/py#!issueid=py{}&type=current&issnprint=1759-9954
+    start_vol: 11
+    end_vol: 13
+    issue_per_year: 48

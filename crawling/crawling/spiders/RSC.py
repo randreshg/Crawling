@@ -28,7 +28,7 @@ def convertToString(string):
 class RSCSpider(scrapy.Spider):
     name = "RSC"
 
-    with open(os.path.join(os.path.dirname(__file__), 'start_urls.yaml'), 'r') as yf:
+    with open(os.path.join(os.path.dirname(__file__), './start_urls.yaml'), 'r') as yf:
         url_yaml = yaml.safe_load(yf)
 
     start_urls = url_yaml[name]
@@ -44,25 +44,28 @@ class RSCSpider(scrapy.Spider):
             yield response
 
     def parse(self, response):
-        crawl_results = self.common_info.copy()
-        issue_year = self._parse_issue_year(response)
-        crawl_results.update(issue_year)
-        if issue_year['Published_Year'] >= 2000:
-            print("Scraping journal {}, year {}, issue {}".format(issue_year['Journal'],
-                                                                  issue_year['Published_Year'],
-                                                                  issue_year['Issue']))
-            # Crawling
-            for article_tab in response.css('div.capsule.capsule--article'):
-                article_type = convertToString(article_tab.css('span.capsule__context'))
-                open_access = bool(article_tab.css("span.capsule__context > img").extract_first())
-                if article_type not in self.exclude_article_types:
-                    article_page = article_tab.css('a.capsule__action::attr(href)').extract_first()
-                    article_page = response.urljoin(article_page)
-                    current_crawl_results = crawl_results.copy()
-                    current_crawl_results.update({"Article_Type": article_type, "Open_Access": open_access})
-                    request = SplashRequest(article_page, self._parse_article, args={'lua_source': SPLASH_SCRIPT.format(4)}, endpoint='execute')
-                    request.meta['meta_info'] = current_crawl_results
-                    yield request
+        try:
+            crawl_results = self.common_info.copy()
+            issue_year = self._parse_issue_year(response)
+            crawl_results.update(issue_year)
+            if issue_year['Published_Year'] >= 2000:
+                print("-----Scraping journal {}, year {}, issue {}".format(issue_year['Journal'],
+                                                                    issue_year['Published_Year'],
+                                                                    issue_year['Issue']))
+                # Crawling
+                for article_tab in response.css('div.capsule.capsule--article'):
+                    article_type = convertToString(article_tab.css('span.capsule__context'))
+                    open_access = bool(article_tab.css("span.capsule__context > img").extract_first())
+                    if article_type not in self.exclude_article_types:
+                        article_page = article_tab.css('a.capsule__action::attr(href)').extract_first()
+                        article_page = response.urljoin(article_page)
+                        current_crawl_results = crawl_results.copy()
+                        current_crawl_results.update({"Article_Type": article_type, "Open_Access": open_access})
+                        request = SplashRequest(article_page, self._parse_article, args={'lua_source': SPLASH_SCRIPT.format(4)}, endpoint='execute')
+                        request.meta['meta_info'] = current_crawl_results
+                        yield request
+        except:
+            print("-----No issues available yet")
 
 
     @staticmethod
